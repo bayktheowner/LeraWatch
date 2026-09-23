@@ -158,14 +158,27 @@ function renderCard(item) {
 }
 
 function bindCards(items) {
-  const byKey = new Map(items.map((item) => [itemKey(item), item]));
-  document.querySelectorAll('.movie-card').forEach((card) => {
-    card.onclick = () => {
-      const item = byKey.get(card.dataset.key);
-      if (item) openDetails(item);
-    };
-  });
+  // Cards are handled by one delegated listener below.
+  // This is more reliable in iPhone Safari/PWA after dynamic HTML rendering.
 }
+
+function findItemByKey(key) {
+  const library = getLibrary();
+  return (
+    lastSearchResults.find((item) => itemKey(item) === key) ||
+    library.want.find((item) => itemKey(item) === key) ||
+    library.watched.find((item) => itemKey(item) === key) ||
+    null
+  );
+}
+
+result.addEventListener('click', (event) => {
+  const card = event.target.closest('.movie-card');
+  if (!card || !result.contains(card)) return;
+
+  const item = findItemByKey(card.dataset.key);
+  if (item) openDetails(item);
+});
 
 function openDetails(item) {
   const type = item.type === 'tv' ? 'Сериал' : 'Фильм';
