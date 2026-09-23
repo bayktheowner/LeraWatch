@@ -180,7 +180,7 @@ result.addEventListener('click', (event) => {
   if (item) openDetails(item);
 });
 
-function openDetails(item) {
+async function openDetails(item) {
   const type = item.type === 'tv' ? 'Сериал' : 'Фильм';
   const rating = item.rating == null ? '—' : Number(item.rating).toFixed(1);
   const status = getStatus(item);
@@ -200,6 +200,12 @@ function openDetails(item) {
           ${item.year ? `<span>${escapeHtml(item.year)}</span>` : ''}
           <span>★ ${escapeHtml(rating)}</span>
         </div>
+
+        <section class="watch-box" id="watchBox">
+          <div class="watch-title">Где посмотреть</div>
+          <div class="watch-loading">Ищем площадки… ✦</div>
+        </section>
+
         <p class="detail-overview">${escapeHtml(item.overview || 'Описание пока отсутствует.')}</p>
         <div class="detail-actions">
           <button class="want-btn ${status === 'want' ? 'selected' : ''}">♡ ${status === 'want' ? 'В списке «Хочу»' : 'Хочу посмотреть'}</button>
@@ -218,8 +224,83 @@ function openDetails(item) {
   modal.querySelector('.watched-btn').onclick = () => setStatus(item, 'watched');
   const remove = modal.querySelector('.remove-btn');
   if (remove) remove.onclick = () => setStatus(item, null);
+
+  loadWatchProviders(item);
 }
 
+async function loadWatchProviders(item) {
+  const box = document.querySelector('#watchBox');
+  if (!box) return;
+
+  try {
+    const url = new URL('/watch', API_BASE);
+    url.searchParams.set('id', item.id);
+    url.searchParams.set('type', item.type);
+    url.searchParams.set('region', 'RU');
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || 'Не удалось получить площадки');
+    }
+
+    // The user may have already opened another title while this request was running.
+    const activeTitle = modal.querySelector('h2')?.textContent || '';
+    if (activeTitle !== (item.title || 'Без названия')) return;
+
+    renderWatchProviders(box, data);
+  } catch (error) {
+    if (!document.body.contains(box)) return;
+    box.innerHTML = `
+      <div class="watch-title">Где посмотреть</div>
+      <div class="watch-empty">Не удалось загрузить площадки.</div>`;
+  }
+}
+
+function renderWatchProviders(box, data) {
+  const groups = [
+    ['flatrate', 'По подписке'],
+    ['free', 'Бесплатно'],
+    ['ads', 'С рекламой'],
+    ['rent', 'Аренда'],
+    ['buy', 'Купить']
+  ];
+
+  const visible = groups.filter(([key]) => (data.providers?.[key] || []).length);
+
+  if (!data.available || !visible.length) {
+    box.innerHTML = `
+      <div class="watch-title">Где посмотреть</div>
+      <div class="watch-empty">Для выбранного региона площадки пока не найдены.</div>
+      <div class="watch-credit">Данные о доступности: JustWatch</div>`;
+    return;
+  }
+
+  const content = visible.map(([key, label]) => `
+    <div class="provider-group">
+      <div class="provider-label">${label}</div>
+      <div class="provider-list">
+        ${(data.providers[key] || []).map((provider) => `
+          <div class="provider">
+            ${provider.logo
+              ? `<img src="${escapeAttr(provider.logo)}" alt="">`
+              : `<div class="provider-logo-empty">${escapeHtml((provider.name || '?').slice(0,1))}</div>`}
+            <span>${escapeHtml(provider.name || 'Сервис')}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const link = data.link
+    ? `<a class="watch-link" href="${escapeAttr(data.link)}" target="_blank" rel="noopener noreferrer">Открыть варианты просмотра ↗</a>`
+    : '';
+
+  box.innerHTML = `
+    <div class="watch-title">Где посмотреть</div>
+    ${content}
+    ${link}
+    <div class="watch-credit">Данные о доступности: JustWatch</div>`;
+}
 function closeDetails() {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
