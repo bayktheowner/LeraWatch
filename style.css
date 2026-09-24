@@ -7,7 +7,7 @@
 
 .movie-card{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .movie-card *{pointer-events:none}
-.detail-modal,.detail-sheet,.detail-sheet *{pointer-events:auto}
+
 
 .watch-box{text-align:left;margin:18px 0;padding:15px;background:#1a1024;border:1px solid #3d2950;border-radius:18px}
 .watch-title{font-size:18px;font-weight:850;margin-bottom:11px}
