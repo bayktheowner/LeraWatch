@@ -38,6 +38,41 @@
 
 <div id="detailModal" class="detail-modal" aria-hidden="true"></div>
 <div id="toast" class="toast"></div>
+
+<script>
+(function () {
+  function showDiag(message) {
+    var old = document.getElementById('lw-debug');
+    if (old) old.remove();
+    var box = document.createElement('pre');
+    box.id = 'lw-debug';
+    box.style.cssText =
+      'position:fixed;left:8px;right:8px;top:8px;z-index:999999;' +
+      'max-height:45vh;overflow:auto;margin:0;padding:12px;' +
+      'background:#3b0710;color:#fff;border:2px solid #ff6178;' +
+      'border-radius:12px;font:12px/1.4 monospace;white-space:pre-wrap;' +
+      'word-break:break-word;text-align:left;';
+    box.textContent = message;
+    document.body.appendChild(box);
+  }
+
+  window.addEventListener('error', function (e) {
+    showDiag(
+      'LERAWATCH JS ERROR\n\n' +
+      (e.message || 'Unknown error') +
+      '\nFile: ' + (e.filename || '-') +
+      '\nLine: ' + (e.lineno || '-') +
+      '\nColumn: ' + (e.colno || '-')
+    );
+  });
+
+  window.addEventListener('unhandledrejection', function (e) {
+    var reason = e.reason && (e.reason.stack || e.reason.message || String(e.reason));
+    showDiag('LERAWATCH PROMISE ERROR\n\n' + (reason || 'Unknown rejection'));
+  });
+})();
+</script>
+
 <script src="app.js"></script>
 </body>
 </html>
