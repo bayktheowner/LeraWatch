@@ -237,6 +237,7 @@ async function loadWatchProviders(item) {
     url.searchParams.set('id', String(item.id));
     url.searchParams.set('type', item.type);
     url.searchParams.set('region', 'RU');
+    url.searchParams.set('title', item.title || item.originalTitle || '');
 
     const response = await fetch(url.toString());
     const data = await response.json();
@@ -281,10 +282,19 @@ function renderWatchProviders(content, data) {
         ? `<img src="${escapeAttr(provider.logo)}" alt="">`
         : '<div class="provider-logo-empty">▶</div>';
 
+      const providerName = escapeHtml(provider.name || 'Сервис');
+      if (provider.url) {
+        return `
+          <a class="provider provider-link" href="${escapeAttr(provider.url)}" target="_blank" rel="noopener noreferrer" aria-label="Открыть ${providerName}">
+            ${logo}
+            <span>${providerName} ↗</span>
+          </a>`;
+      }
+
       return `
         <div class="provider">
           ${logo}
-          <span>${escapeHtml(provider.name || 'Сервис')}</span>
+          <span>${providerName}</span>
         </div>`;
     }).join('');
 
