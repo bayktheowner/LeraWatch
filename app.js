@@ -203,7 +203,7 @@ function openDetails(item) {
 
         <section class="watch-box">
           <div class="watch-title">Где посмотреть</div>
-          <div class="watch-content" id="watchContent">Ищем площадки… ✦</div>
+          <div id="watchContent" class="watch-content">Ищем площадки… ✦</div>
         </section>
 
         <p class="detail-overview">${escapeHtml(item.overview || 'Описание пока отсутствует.')}</p>
@@ -228,26 +228,30 @@ function openDetails(item) {
   loadWatchProviders(item);
 }
 
-function loadWatchProviders(item) {
-  const content = document.querySelector('#watchContent');
+async function loadWatchProviders(item) {
+  const content = modal.querySelector('#watchContent');
   if (!content) return;
 
-  const url = new URL('/watch', API_BASE);
-  url.searchParams.set('id', String(item.id));
-  url.searchParams.set('type', item.type);
-  url.searchParams.set('region', 'RU');
+  try {
+    const url = new URL('/watch', API_BASE);
+    url.searchParams.set('id', String(item.id));
+    url.searchParams.set('type', item.type);
+    url.searchParams.set('region', 'RU');
 
-  fetch(url.toString())
-    .then((response) => response.json().then((data) => ({ response, data })))
-    .then(({ response, data }) => {
-      if (!response.ok || !data.ok) throw new Error(data.error || 'Ошибка площадок');
-      if (!document.body.contains(content)) return;
-      renderWatchProviders(content, data);
-    })
-    .catch(() => {
-      if (!document.body.contains(content)) return;
-      content.innerHTML = '<div class="watch-empty">Не удалось загрузить площадки.</div>';
-    });
+    const response = await fetch(url.toString());
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || 'Ошибка площадок');
+    }
+
+    // Ignore a late response if this card was already closed/replaced.
+    if (!content.isConnected) return;
+    renderWatchProviders(content, data);
+  } catch (error) {
+    if (!content.isConnected) return;
+    content.innerHTML = '<div class="watch-empty">Не удалось загрузить площадки.</div>';
+  }
 }
 
 function renderWatchProviders(content, data) {
@@ -259,34 +263,43 @@ function renderWatchProviders(content, data) {
     ['buy', 'Купить']
   ];
 
-  const visible = groups.filter(([key]) => data.providers && Array.isArray(data.providers[key]) && data.providers[key].length);
+  const providers = data.providers || {};
+  const visible = groups.filter(([key]) =>
+    Array.isArray(providers[key]) && providers[key].length > 0
+  );
 
-  if (!data.available || !visible.length) {
-    content.innerHTML = `
-      <div class="watch-empty">Для региона RU площадки пока не найдены.</div>
-      <div class="watch-credit">Данные о доступности: JustWatch</div>`;
+  if (!data.available || visible.length === 0) {
+    content.innerHTML =
+      '<div class="watch-empty">Для региона RU площадки пока не найдены.</div>' +
+      '<div class="watch-credit">Данные о доступности: JustWatch</div>';
     return;
   }
 
-  const blocks = visible.map(([key, label]) => {
-    const providers = data.providers[key].map((provider) => `
-      <div class="provider">
-        ${provider.logo ? `<img src="${escapeAttr(provider.logo)}" alt="">` : '<div class="provider-logo-empty">▶</div>'}
-        <span>${escapeHtml(provider.name || 'Сервис')}</span>
-      </div>`).join('');
+  content.innerHTML = visible.map(([key, label]) => {
+    const cards = providers[key].map((provider) => {
+      const logo = provider.logo
+        ? `<img src="${escapeAttr(provider.logo)}" alt="">`
+        : '<div class="provider-logo-empty">▶</div>';
+
+      return `
+        <div class="provider">
+          ${logo}
+          <span>${escapeHtml(provider.name || 'Сервис')}</span>
+        </div>`;
+    }).join('');
 
     return `
       <div class="provider-group">
         <div class="provider-label">${label}</div>
-        <div class="provider-list">${providers}</div>
+        <div class="provider-list">${cards}</div>
       </div>`;
-  }).join('');
-
-  content.innerHTML = `
-    ${blocks}
-    ${data.link ? `<a class="watch-link" href="${escapeAttr(data.link)}" target="_blank" rel="noopener">Все варианты просмотра ↗</a>` : ''}
-    <div class="watch-credit">Данные о доступности: JustWatch</div>`;
+  }).join('') +
+  (data.link
+    ? `<a class="watch-link" href="${escapeAttr(data.link)}" target="_blank" rel="noopener noreferrer">Все варианты просмотра ↗</a>`
+    : '') +
+  '<div class="watch-credit">Данные о доступности: JustWatch</div>';
 }
+
 function closeDetails() {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
