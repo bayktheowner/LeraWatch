@@ -1,5 +1,5 @@
-window.LERAWATCH_VERSION='0.6.3';
-console.info('LeraWatch v0.6.3 NAVIGATION FIX');
+window.LERAWATCH_VERSION='0.6.4';
+console.info('LeraWatch v0.6.4 SEARCH STATE FIX');
 const API_BASE = 'https://lerawatch-api.alxeyonway.workers.dev';
 const STORAGE_KEY = 'lerawatch-library-v1';
 
@@ -428,16 +428,29 @@ function bindProfile(){
 }
 
 
+
+function renderSearchState() {
+  if (lastSearchResults.length) {
+    renderResults(lastSearchResults, lastQuery || q.value.trim());
+    return;
+  }
+  result.innerHTML = `
+    <div class="empty">
+      Найди фильм, сериал или аниме — результаты появятся здесь.
+    </div>
+  `;
+}
+
 function switchView(view, rerender = true) {
   currentView = view;
   navButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.view === view));
 
   if (!rerender) return;
 
+  result.innerHTML = '';
+
   if (view === 'search') {
     searchTools.style.display = '';
-    // Remove any profile/library markup before restoring search state.
-    result.innerHTML = '';
     renderSearchState();
     return;
   }
@@ -445,12 +458,10 @@ function switchView(view, rerender = true) {
   searchTools.style.display = 'none';
 
   if (view === 'profile') {
-    result.innerHTML = '';
     renderProfile();
     return;
   }
 
-  result.innerHTML = '';
   renderLibrary(view);
 }
 
