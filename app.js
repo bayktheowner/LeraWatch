@@ -287,7 +287,7 @@ function renderWatchProviders(content, data) {
         return `
           <a class="provider provider-link" href="${escapeAttr(provider.url)}" target="_blank" rel="noopener noreferrer" aria-label="Открыть ${providerName}">
             ${logo}
-            <span>${providerName} ↗</span>
+            <span class="provider-name-clean">${providerName}</span>
           </a>`;
       }
 

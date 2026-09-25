@@ -24,3 +24,175 @@
 
 .provider-link{color:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:rgba(196,145,255,.18);touch-action:manipulation}
 .provider-link:active{transform:scale(.94);opacity:.82}
+
+
+/* ===== LeraWatch v0.5.6 — Motion + Soft Pink UI ===== */
+:root{
+  --soft-pink:#efc7e6;
+  --soft-pink-2:#dcb6dc;
+  --soft-pink-3:#b98fc5;
+  --button-ink:#241526;
+}
+
+/* Brighter, softer pink controls */
+.search button,
+.want-btn{
+  background:linear-gradient(135deg,var(--soft-pink),var(--soft-pink-2));
+  color:var(--button-ink);
+  box-shadow:0 8px 24px rgba(239,199,230,.14);
+}
+.watched-btn{
+  border:1px solid rgba(239,199,230,.42);
+  background:rgba(239,199,230,.10);
+  color:#f6dff1;
+}
+.chip{
+  border-color:rgba(239,199,230,.24);
+  background:rgba(239,199,230,.08);
+  color:#e8cfe3;
+}
+.nav-btn{color:#d8b6d5}
+.nav-btn.active{color:#f3cce9}
+
+/* Smooth appearance of content */
+#result > *{
+  animation:lwFadeUp .34s cubic-bezier(.22,.8,.3,1) both;
+}
+.results .movie-card{
+  animation:lwCardIn .38s cubic-bezier(.22,.8,.3,1) both;
+}
+.results .movie-card:nth-child(2){animation-delay:.035s}
+.results .movie-card:nth-child(3){animation-delay:.07s}
+.results .movie-card:nth-child(4){animation-delay:.105s}
+.results .movie-card:nth-child(5){animation-delay:.14s}
+
+@keyframes lwFadeUp{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes lwCardIn{
+  from{opacity:0;transform:translateY(14px) scale(.985)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* Modal now physically floats in and out */
+.detail-modal{
+  transition:opacity .28s ease,visibility .28s ease;
+  visibility:hidden;
+}
+.detail-modal.open{visibility:visible}
+.detail-sheet{
+  transform:translateY(34px) scale(.985);
+  opacity:.72;
+  transition:
+    transform .36s cubic-bezier(.22,.9,.28,1),
+    opacity .28s ease;
+  will-change:transform,opacity;
+}
+.detail-modal.open .detail-sheet{
+  transform:translateY(0) scale(1);
+  opacity:1;
+}
+.detail-close{
+  transition:transform .16s ease,background .16s ease;
+}
+.detail-close:active{transform:scale(.9)}
+
+/* Softer button tap motion */
+.search button,.chip,.want-btn,.watched-btn,.watch-link,.nav-btn{
+  transition:transform .16s ease,opacity .16s ease,background .2s ease,box-shadow .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.search button:active,.chip:active,.want-btn:active,.watched-btn:active,.watch-link:active{
+  transform:scale(.97);
+}
+
+/* Providers = one full-width rounded row each */
+.provider-list{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+  overflow:visible;
+  padding:0;
+}
+.provider{
+  width:100%;
+  min-height:62px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  padding:8px 12px;
+  border-radius:18px;
+  border:1px solid rgba(239,199,230,.20);
+  background:linear-gradient(135deg,rgba(239,199,230,.12),rgba(185,143,197,.08));
+}
+.provider img,.provider-logo-empty{
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+  margin:0;
+  border-radius:13px;
+}
+.provider span{
+  flex:1;
+  color:#f3dfee;
+  font-size:14px;
+  font-weight:750;
+  line-height:1.2;
+}
+.provider-link{
+  position:relative;
+  padding-right:42px;
+  transition:transform .16s ease,border-color .18s ease,background .18s ease;
+}
+.provider-link::after{
+  content:"↗";
+  position:absolute;
+  right:16px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--soft-pink);
+  font-size:19px;
+  font-weight:800;
+}
+.provider-link:active{
+  transform:scale(.985);
+  opacity:1;
+  border-color:rgba(239,199,230,.48);
+  background:rgba(239,199,230,.16);
+}
+/* JS already adds an arrow to linked provider names; keep only the row-end arrow */
+.provider-link span{font-size:0}
+.provider-link span::first-letter{font-size:0}
+
+/* Restore provider name without the JS arrow via a dedicated generated child */
+.provider-name-clean{
+  flex:1;
+  color:#f3dfee;
+  font-size:14px;
+  font-weight:750;
+  line-height:1.2;
+}
+
+.watch-link{
+  margin-top:16px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:linear-gradient(135deg,rgba(239,199,230,.18),rgba(220,182,220,.12));
+  border:1px solid rgba(239,199,230,.22);
+  color:#f5dff0;
+}
+.watch-box{
+  border-color:rgba(239,199,230,.20);
+  box-shadow:0 14px 35px rgba(0,0,0,.10);
+}
+
+/* Respect iOS accessibility setting */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
