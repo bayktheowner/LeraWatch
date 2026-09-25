@@ -322,7 +322,113 @@ modal.addEventListener('click', (e) => {
 
 function switchView(view, rerender = true) {
   currentView = view;
-  navButtons.forEach((button) => button.classList.toggle('active', button.dataset.view === view));
+  
+// ===== LeraWatch v0.6 PROFILE =====
+const PROFILE_KEY = 'lerawatch-profile-v1';
+const SERVICES = [
+  {id:'yandex', name:'Кинопоиск / Яндекс Плюс', price:'449 ₽/мес', desc:'Кинопоиск, Музыка, Книги и Плюс для 4 человек.', url:'https://plus.yandex.ru/'},
+  {id:'ivi', name:'Иви', price:'399 ₽/мес', desc:'Фильмы и сериалы, без рекламы, 4K/HDR там, где доступно.', url:'https://www.ivi.ru/'},
+  {id:'wink', name:'Wink Всё в одном', price:'399 ₽/мес', desc:'Фильмы, сериалы, ТВ, спорт, музыка и игры.', url:'https://wink.ru/services'},
+  {id:'start', name:'START', price:'499 ₽/мес', desc:'Российские оригинальные сериалы и фильмы START.', url:'https://start.ru/'},
+  {id:'premier', name:'PREMIER', price:'399 ₽/мес', desc:'Фильмы, сериалы, шоу и проекты PREMIER / RUTUBE.', url:'https://premier.one/'},
+  {id:'kion', name:'KION', price:'от 399 ₽ / 3 мес*', desc:'KION Originals, фильмы, сериалы и 200+ ТВ-каналов. *Акционная цена для новых пользователей.', url:'https://standalone.kion.ru/'},
+  {id:'amediateka', name:'AMEDIATEKA', price:'599 ₽/мес', desc:'Зарубежные сериалы, премьеры и 4 ТВ-канала.', url:'https://www.amediateka.ru/'}
+];
+
+function getProfile(){
+  try{return JSON.parse(localStorage.getItem(PROFILE_KEY))||{subscriptions:[],progress:{},liked:[]};}
+  catch(e){return {subscriptions:[],progress:{},liked:[]};}
+}
+function saveProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p));}
+function getLibrarySafe(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch(e){return {};}
+}
+function countLibrary(){
+  const lib=getLibrarySafe();
+  const want=Array.isArray(lib.want)?lib.want.length:0;
+  const watched=Array.isArray(lib.watched)?lib.watched.length:0;
+  return {want,watched};
+}
+function renderProfile(){
+  const p=getProfile(), counts=countLibrary();
+  const progressCount=Object.keys(p.progress||{}).length;
+  const likedCount=(p.liked||[]).length;
+  searchTools.style.display='none';
+  result.innerHTML=`
+    <section class="profile-page">
+      <div class="profile-hero">
+        <div class="profile-avatar">L</div>
+        <div><div class="profile-kicker">LERAWATCH PROFILE</div><h2>Мой профиль</h2></div>
+      </div>
+      <div class="profile-stats">
+        <div><b>${counts.watched}</b><span>просмотрено</span></div>
+        <div><b>${progressCount}</b><span>смотрю</span></div>
+        <div><b>${counts.want}</b><span>хочу</span></div>
+        <div><b>${likedCount}</b><span>лайков</span></div>
+      </div>
+
+      <div class="profile-section-head"><h3>Мои подписки</h3><span>${p.subscriptions.length} подключено</span></div>
+      <div class="service-list my-services">
+        ${SERVICES.filter(s=>p.subscriptions.includes(s.id)).map(serviceCard).join('') || '<div class="profile-empty">Отметь сервисы ниже — они появятся здесь.</div>'}
+      </div>
+
+      <div class="profile-section-head"><h3>Все сервисы</h3><span>цены на сентябрь 2026</span></div>
+      <div class="service-list">${SERVICES.map(serviceCard).join('')}</div>
+
+      <div class="profile-section-head"><h3>Продолжить просмотр</h3><span>сезон и серия</span></div>
+      <div class="progress-editor">
+        <input id="progressTitle" placeholder="Название сериала">
+        <div class="progress-row">
+          <input id="progressSeason" inputmode="numeric" placeholder="Сезон">
+          <input id="progressEpisode" inputmode="numeric" placeholder="Серия">
+          <button id="saveProgress">Сохранить</button>
+        </div>
+      </div>
+      <div class="progress-list">
+        ${Object.entries(p.progress||{}).map(([title,v])=>`
+          <div class="progress-item"><div><b>${escapeHtml(title)}</b><span>Сезон ${v.season} • Серия ${v.episode}</span></div>
+          <button data-remove-progress="${escapeHtml(title)}">×</button></div>`).join('') || '<div class="profile-empty">Пока ничего не отмечено.</div>'}
+      </div>
+
+      <div class="profile-section-head"><h3>Понравилось</h3><span>♥ личная коллекция</span></div>
+      <div class="profile-empty">Лайки уже заложены в профиль. В следующем шаге привяжем ♥ прямо к карточке фильма.</div>
+    </section>`;
+  bindProfile();
+}
+function serviceCard(s){
+  const p=getProfile(), active=p.subscriptions.includes(s.id);
+  return `<div class="service-card ${active?'owned':''}">
+    <div class="service-main">
+      <div class="service-monogram">${s.name.slice(0,1)}</div>
+      <div class="service-copy"><b>${s.name}</b><strong>${s.price}</strong><p>${s.desc}</p></div>
+    </div>
+    <div class="service-actions">
+      <button class="sub-toggle" data-service="${s.id}">${active?'✓ Есть подписка':'+ Моя подписка'}</button>
+      <a href="${s.url}" target="_blank" rel="noopener noreferrer">Подробнее ↗</a>
+    </div>
+  </div>`;
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function bindProfile(){
+  result.querySelectorAll('[data-service]').forEach(btn=>btn.onclick=()=>{
+    const p=getProfile(), id=btn.dataset.service;
+    p.subscriptions=p.subscriptions.includes(id)?p.subscriptions.filter(x=>x!==id):[...p.subscriptions,id];
+    saveProfile(p); renderProfile();
+  });
+  const save=result.querySelector('#saveProgress');
+  if(save) save.onclick=()=>{
+    const title=result.querySelector('#progressTitle').value.trim();
+    const season=parseInt(result.querySelector('#progressSeason').value,10);
+    const episode=parseInt(result.querySelector('#progressEpisode').value,10);
+    if(!title || !season || !episode){showToast('Укажи название, сезон и серию');return;}
+    const p=getProfile(); p.progress[title]={season,episode}; saveProfile(p); renderProfile(); showToast('Прогресс сохранён');
+  };
+  result.querySelectorAll('[data-remove-progress]').forEach(btn=>btn.onclick=()=>{
+    const p=getProfile(); delete p.progress[btn.dataset.removeProgress]; saveProfile(p); renderProfile();
+  });
+}
+
+navButtons.forEach((button) => button.classList.toggle('active', button.dataset.view === view));
   searchTools.hidden = view !== 'search';
 
   if (!rerender) return;
