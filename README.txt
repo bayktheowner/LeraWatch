@@ -1,9 +1,10 @@
-LeraWatch v0.6.2 PROFILE ROUTING FIX
-- switchView rewritten explicitly
-- profile -> renderProfile
-- search -> renderSearchState
-- want/watched -> renderLibrary
-- authoritative capture-phase bottom navigation
-- cache assets bumped to 062
-- API/deep links untouched
-Replace all root files.
+LeraWatch v0.6.3 NAVIGATION FIX
+Исправлено смешивание экранов при переходах:
+- Профиль -> Поиск
+- Поиск -> Профиль
+- Профиль/Поиск -> Хочу
+- Профиль/Поиск -> Просмотрено
+
+Перед рендером нового раздела #result очищается.
+API и provider deep-links не изменялись.
+Cache bust: 063.

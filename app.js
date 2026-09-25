@@ -1,5 +1,5 @@
-window.LERAWATCH_VERSION='0.6.2';
-console.info('LeraWatch v0.6.2 PROFILE ROUTING FIX');
+window.LERAWATCH_VERSION='0.6.3';
+console.info('LeraWatch v0.6.3 NAVIGATION FIX');
 const API_BASE = 'https://lerawatch-api.alxeyonway.workers.dev';
 const STORAGE_KEY = 'lerawatch-library-v1';
 
@@ -436,6 +436,8 @@ function switchView(view, rerender = true) {
 
   if (view === 'search') {
     searchTools.style.display = '';
+    // Remove any profile/library markup before restoring search state.
+    result.innerHTML = '';
     renderSearchState();
     return;
   }
@@ -443,10 +445,12 @@ function switchView(view, rerender = true) {
   searchTools.style.display = 'none';
 
   if (view === 'profile') {
+    result.innerHTML = '';
     renderProfile();
     return;
   }
 
+  result.innerHTML = '';
   renderLibrary(view);
 }
 
