@@ -1,10 +1,9 @@
-LeraWatch PWA v0.6 PROFILE
-- новый раздел Профиль в нижней навигации
-- Мои подписки + каталог сервисов
-- цены и краткие описания
-- локальное хранение выбранных подписок
-- Продолжить просмотр: название / сезон / серия
-- статистика профиля
-- заготовка раздела Понравилось
-API v0.6.2 менять не нужно.
-Заменить все файлы в корне GitHub Pages.
+LeraWatch v0.6.1 PROFILE FIX
+FIX:
+- Profile helpers moved to top-level JS
+- switchView() explicitly routes profile -> renderProfile()
+- nav handler routes through switchView()
+- asset cache version bumped to 061
+- visible LeraWatch v0.6.1 marker in Profile
+API backend unchanged.
+Replace all root PWA files.

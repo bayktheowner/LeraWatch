@@ -1,3 +1,5 @@
+window.LERAWATCH_VERSION='0.6.1';
+console.info('LeraWatch v0.6.1 PROFILE FIX');
 const API_BASE = 'https://lerawatch-api.alxeyonway.workers.dev';
 const STORAGE_KEY = 'lerawatch-library-v1';
 
@@ -320,9 +322,6 @@ modal.addEventListener('click', (e) => {
   if (e.target === modal) closeDetails();
 });
 
-function switchView(view, rerender = true) {
-  currentView = view;
-  
 // ===== LeraWatch v0.6 PROFILE =====
 const PROFILE_KEY = 'lerawatch-profile-v1';
 const SERVICES = [
@@ -428,15 +427,20 @@ function bindProfile(){
   });
 }
 
-navButtons.forEach((button) => button.classList.toggle('active', button.dataset.view === view));
-  searchTools.hidden = view !== 'search';
 
-  if (!rerender) return;
-  if (view === 'search') {
-    if (lastSearchResults.length) renderResults(lastSearchResults, lastQuery);
-    else result.innerHTML = '<div class="empty">Введите название или выберите один из наших тестов ✦</div>';
+function switchView(view, rerender = true) {
+  currentView = view, rerender = true;
+  navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view, rerender = true));
+
+  if (view, rerender = true === 'search') {
+    searchTools.style.display = '';
+    renderSearchState();
+  } else if (view, rerender = true === 'profile') {
+    searchTools.style.display = 'none';
+    renderProfile();
   } else {
-    renderLibrary(view);
+    searchTools.style.display = 'none';
+    renderLibrary(view, rerender = true);
   }
 }
 
