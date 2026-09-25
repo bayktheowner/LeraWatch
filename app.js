@@ -1,5 +1,5 @@
-window.LERAWATCH_VERSION='0.6.1';
-console.info('LeraWatch v0.6.1 PROFILE FIX');
+window.LERAWATCH_VERSION='0.6.2';
+console.info('LeraWatch v0.6.2 PROFILE ROUTING FIX');
 const API_BASE = 'https://lerawatch-api.alxeyonway.workers.dev';
 const STORAGE_KEY = 'lerawatch-library-v1';
 
@@ -429,19 +429,25 @@ function bindProfile(){
 
 
 function switchView(view, rerender = true) {
-  currentView = view, rerender = true;
-  navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view, rerender = true));
+  currentView = view;
+  navButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.view === view));
 
-  if (view, rerender = true === 'search') {
+  if (!rerender) return;
+
+  if (view === 'search') {
     searchTools.style.display = '';
     renderSearchState();
-  } else if (view, rerender = true === 'profile') {
-    searchTools.style.display = 'none';
-    renderProfile();
-  } else {
-    searchTools.style.display = 'none';
-    renderLibrary(view, rerender = true);
+    return;
   }
+
+  searchTools.style.display = 'none';
+
+  if (view === 'profile') {
+    renderProfile();
+    return;
+  }
+
+  renderLibrary(view);
 }
 
 navButtons.forEach((button) => {
@@ -471,3 +477,12 @@ function escapeAttr(value = '') { return escapeHtml(value); }
 go.onclick = search;
 q.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(); });
 result.innerHTML = '<div class="empty">Введите название или выберите один из наших тестов ✦</div>';
+
+// v0.6.2 authoritative bottom-nav routing
+navButtons.forEach((btn) => {
+  btn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    switchView(btn.dataset.view);
+  }, true);
+});

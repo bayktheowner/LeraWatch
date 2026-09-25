@@ -1,9 +1,9 @@
-LeraWatch v0.6.1 PROFILE FIX
-FIX:
-- Profile helpers moved to top-level JS
-- switchView() explicitly routes profile -> renderProfile()
-- nav handler routes through switchView()
-- asset cache version bumped to 061
-- visible LeraWatch v0.6.1 marker in Profile
-API backend unchanged.
-Replace all root PWA files.
+LeraWatch v0.6.2 PROFILE ROUTING FIX
+- switchView rewritten explicitly
+- profile -> renderProfile
+- search -> renderSearchState
+- want/watched -> renderLibrary
+- authoritative capture-phase bottom navigation
+- cache assets bumped to 062
+- API/deep links untouched
+Replace all root files.
