@@ -26,173 +26,142 @@
 .provider-link:active{transform:scale(.94);opacity:.82}
 
 
-/* ===== LeraWatch v0.5.6 — Motion + Soft Pink UI ===== */
+/* =========================================================
+   LeraWatch v0.5.7 DESIGN + CACHE FIX
+   ========================================================= */
 :root{
-  --soft-pink:#efc7e6;
-  --soft-pink-2:#dcb6dc;
-  --soft-pink-3:#b98fc5;
-  --button-ink:#241526;
+  --lw-pink:#f1c9e8;
+  --lw-pink-strong:#e8b8dc;
+  --lw-pink-text:#2a1729;
 }
 
-/* Brighter, softer pink controls */
-.search button,
-.want-btn{
-  background:linear-gradient(135deg,var(--soft-pink),var(--soft-pink-2));
-  color:var(--button-ink);
-  box-shadow:0 8px 24px rgba(239,199,230,.14);
+/* Buttons */
+#go,.want-btn{
+  background:linear-gradient(135deg,#f4d2ec,#e6b7dd)!important;
+  color:#281727!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  box-shadow:0 8px 24px rgba(238,191,226,.15)!important;
 }
-.watched-btn{
-  border:1px solid rgba(239,199,230,.42);
-  background:rgba(239,199,230,.10);
-  color:#f6dff1;
+.watched-btn,.chip{
+  border-color:rgba(241,201,232,.34)!important;
+  background:rgba(241,201,232,.11)!important;
+  color:#f2d8eb!important;
 }
-.chip{
-  border-color:rgba(239,199,230,.24);
-  background:rgba(239,199,230,.08);
-  color:#e8cfe3;
+#go,.want-btn,.watched-btn,.chip,.watch-link,.nav-btn{
+  transition:transform .16s ease,filter .18s ease,background .22s ease,box-shadow .22s ease!important;
+  -webkit-tap-highlight-color:transparent;
 }
-.nav-btn{color:#d8b6d5}
-.nav-btn.active{color:#f3cce9}
+#go:active,.want-btn:active,.watched-btn:active,.chip:active,.watch-link:active{
+  transform:scale(.965)!important;
+}
 
-/* Smooth appearance of content */
-#result > *{
-  animation:lwFadeUp .34s cubic-bezier(.22,.8,.3,1) both;
-}
-.results .movie-card{
-  animation:lwCardIn .38s cubic-bezier(.22,.8,.3,1) both;
-}
-.results .movie-card:nth-child(2){animation-delay:.035s}
-.results .movie-card:nth-child(3){animation-delay:.07s}
-.results .movie-card:nth-child(4){animation-delay:.105s}
-.results .movie-card:nth-child(5){animation-delay:.14s}
-
-@keyframes lwFadeUp{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:translateY(0)}
-}
-@keyframes lwCardIn{
-  from{opacity:0;transform:translateY(14px) scale(.985)}
+/* Search/list content enters softly */
+#result > *{animation:lwRise .36s cubic-bezier(.2,.8,.25,1) both}
+.movie-card{animation:lwRise .38s cubic-bezier(.2,.8,.25,1) both}
+@keyframes lwRise{
+  from{opacity:0;transform:translateY(14px) scale(.99)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
 
-/* Modal now physically floats in and out */
+/* Modal/sheet motion — preserve closed pointer-events behavior */
 .detail-modal{
-  transition:opacity .28s ease,visibility .28s ease;
-  visibility:hidden;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transition:opacity .26s ease,visibility 0s linear .34s!important;
 }
-.detail-modal.open{visibility:visible}
+.detail-modal.open{
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  transition:opacity .26s ease,visibility 0s linear 0s!important;
+}
 .detail-sheet{
-  transform:translateY(34px) scale(.985);
-  opacity:.72;
-  transition:
-    transform .36s cubic-bezier(.22,.9,.28,1),
-    opacity .28s ease;
+  opacity:0!important;
+  transform:translateY(44px) scale(.985)!important;
+  transition:transform .38s cubic-bezier(.2,.85,.25,1),opacity .27s ease!important;
   will-change:transform,opacity;
 }
 .detail-modal.open .detail-sheet{
-  transform:translateY(0) scale(1);
-  opacity:1;
-}
-.detail-close{
-  transition:transform .16s ease,background .16s ease;
-}
-.detail-close:active{transform:scale(.9)}
-
-/* Softer button tap motion */
-.search button,.chip,.want-btn,.watched-btn,.watch-link,.nav-btn{
-  transition:transform .16s ease,opacity .16s ease,background .2s ease,box-shadow .2s ease;
-  -webkit-tap-highlight-color:transparent;
-}
-.search button:active,.chip:active,.want-btn:active,.watched-btn:active,.watch-link:active{
-  transform:scale(.97);
+  opacity:1!important;
+  transform:translateY(0) scale(1)!important;
 }
 
-/* Providers = one full-width rounded row each */
+/* Where to watch */
+.watch-box{
+  border-color:rgba(241,201,232,.24)!important;
+  background:rgba(26,16,36,.92)!important;
+}
 .provider-list{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:9px;
-  overflow:visible;
-  padding:0;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  overflow:visible!important;
+  padding:0!important;
 }
-.provider{
-  width:100%;
-  min-height:62px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  padding:8px 12px;
-  border-radius:18px;
-  border:1px solid rgba(239,199,230,.20);
-  background:linear-gradient(135deg,rgba(239,199,230,.12),rgba(185,143,197,.08));
+.provider,
+a.provider,
+.provider-link{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:66px!important;
+  margin:0!important;
+  padding:9px 14px!important;
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  gap:13px!important;
+  border-radius:19px!important;
+  border:1px solid rgba(241,201,232,.24)!important;
+  background:linear-gradient(135deg,rgba(241,201,232,.15),rgba(190,143,199,.08))!important;
+  text-align:left!important;
+  text-decoration:none!important;
+  position:relative!important;
 }
 .provider img,.provider-logo-empty{
-  flex:0 0 46px;
-  width:46px;
-  height:46px;
-  margin:0;
-  border-radius:13px;
+  flex:0 0 48px!important;
+  width:48px!important;
+  height:48px!important;
+  margin:0!important;
+  border-radius:14px!important;
+  object-fit:cover!important;
 }
-.provider span{
-  flex:1;
-  color:#f3dfee;
-  font-size:14px;
-  font-weight:750;
-  line-height:1.2;
+.provider span{margin:0!important}
+.provider-name,
+.provider:not(.provider-link)>span{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  color:#f5e1f0!important;
+  font-size:15px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+}
+.provider-arrow{
+  display:block!important;
+  flex:0 0 auto!important;
+  color:#f3c9e9!important;
+  font-size:21px!important;
+  line-height:1!important;
+  font-weight:800!important;
 }
 .provider-link{
-  position:relative;
-  padding-right:42px;
-  transition:transform .16s ease,border-color .18s ease,background .18s ease;
-}
-.provider-link::after{
-  content:"↗";
-  position:absolute;
-  right:16px;
-  top:50%;
-  transform:translateY(-50%);
-  color:var(--soft-pink);
-  font-size:19px;
-  font-weight:800;
+  transition:transform .16s ease,border-color .2s ease,background .2s ease!important;
 }
 .provider-link:active{
-  transform:scale(.985);
-  opacity:1;
-  border-color:rgba(239,199,230,.48);
-  background:rgba(239,199,230,.16);
+  transform:scale(.98)!important;
+  border-color:rgba(241,201,232,.52)!important;
+  background:rgba(241,201,232,.20)!important;
 }
-/* JS already adds an arrow to linked provider names; keep only the row-end arrow */
-.provider-link span{font-size:0}
-.provider-link span::first-letter{font-size:0}
-
-/* Restore provider name without the JS arrow via a dedicated generated child */
-.provider-name-clean{
-  flex:1;
-  color:#f3dfee;
-  font-size:14px;
-  font-weight:750;
-  line-height:1.2;
-}
-
 .watch-link{
-  margin-top:16px;
-  padding:14px 16px;
-  border-radius:18px;
-  background:linear-gradient(135deg,rgba(239,199,230,.18),rgba(220,182,220,.12));
-  border:1px solid rgba(239,199,230,.22);
-  color:#f5dff0;
-}
-.watch-box{
-  border-color:rgba(239,199,230,.20);
-  box-shadow:0 14px 35px rgba(0,0,0,.10);
+  border-radius:18px!important;
+  padding:14px 16px!important;
+  background:rgba(241,201,232,.14)!important;
+  border:1px solid rgba(241,201,232,.22)!important;
+  color:#f5def0!important;
 }
 
-/* Respect iOS accessibility setting */
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.01ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:.01ms!important;
-  }
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
